@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#000000">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Comfortaa:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --red-bright: #ff2a3d;
+        --red-neon:   #ff4d5e;
+        --red-deep:   #c80024;
+        --red-blood:  #8b0011;
+        --red-ember:  #ff7a85;
+        --red-glow:   rgba(255, 42, 61, .55);
+        --red-soft:   rgba(255, 42, 61, .18);
+        --bg-base:    #050608;
+        --bg-card:    rgba(12, 8, 10, 0.72);
+        --bg-card-2:  rgba(20, 10, 14, 0.62);
+        --text-light: #f1f5fb;
+        --text-soft:  #a39296;
+        --line:       rgba(255, 60, 80, .14);
+        --line-2:     rgba(255, 60, 80, .32);
+        --accent-grad:   linear-gradient(180deg, var(--red-bright) 0%, var(--red-deep) 50%, var(--red-blood) 100%);
+        --accent-grad-h: linear-gradient(90deg, var(--red-bright), var(--red-neon), var(--red-deep));
+      }
+
+      html, body {
+        min-height: 100%;
+        font-family: 'Quicksand', sans-serif;
+        color: var(--text-light);
+        overflow-x: hidden;
+        background: var(--bg-base);
+      }
+
+      /* ============ FULL-SCREEN BG (BLACK + RED MOOD) ============ */
+      body {
+        position: relative;
+        min-height: 100vh;
+        padding: 22px 16px 40px;
+        background:
+          linear-gradient(180deg, rgba(0,0,0,.88) 0%, rgba(0,0,0,.96) 100%),
+          url('https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyb3c2NTRldHpuaGUweW1wYWE4eXJuZmtncjMxdnkzbTJjNnBtazcyOCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/EjLTU9HAnnskywtJ9j/giphy.gif') center/cover no-repeat fixed,
+          var(--bg-base);
+      }
+
+      /* glow blobs — all red */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background:
+          radial-gradient(circle at 18% 12%, rgba(255,42,61,.20) 0%, transparent 42%),
+          radial-gradient(circle at 82% 88%, rgba(200,0,36,.20) 0%, transparent 45%),
+          radial-gradient(circle at 50% 55%, rgba(139,0,17,.22) 0%, transparent 55%);
+        animation: bgFloat 14s ease-in-out infinite alternate;
+      }
+      @keyframes bgFloat {
+        from { transform: translate3d(0,0,0) scale(1); }
+        to   { transform: translate3d(-12px,10px,0) scale(1.05); }
+      }
+
+      /* subtle starfield — red embers */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          radial-gradient(1px 1px at 12% 22%, rgba(255,255,255,.45), transparent 60%),
+          radial-gradient(1px 1px at 28% 70%, rgba(255,80,100,.55), transparent 60%),
+          radial-gradient(1.4px 1.4px at 55% 30%, rgba(255,42,61,.7), transparent 60%),
+          radial-gradient(1px 1px at 78% 60%, rgba(255,255,255,.35), transparent 60%),
+          radial-gradient(1.2px 1.2px at 90% 18%, rgba(255,80,100,.6), transparent 60%),
+          radial-gradient(1px 1px at 40% 88%, rgba(255,42,61,.5), transparent 60%),
+          radial-gradient(1.4px 1.4px at 65% 80%, rgba(255,80,100,.55), transparent 60%);
+        background-repeat: repeat;
+        background-size: 600px 600px;
+        opacity: .65;
+        pointer-events: none;
+        z-index: 1;
+        animation: starFloat 60s linear infinite;
+      }
+      @keyframes starFloat {
+        from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+        to   { background-position: 300px 200px, -200px 300px, 400px -100px, -300px 200px, 200px -300px, 100px 400px, -200px -200px; }
+      }
+
+      .app {
+        position: relative;
+        z-index: 2;
+        max-width: 460px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      /* ============ FRAME (shared) — black glass + red accent left border + red corner brackets ============ */
+      .frame {
+        position: relative;
+        background: var(--bg-card);
+        border-radius: 22px;
+        padding: 22px 22px 22px 26px;
+        backdrop-filter: blur(22px) saturate(140%);
+        -webkit-backdrop-filter: blur(22px) saturate(140%);
+        border: 1px solid var(--line);
+        box-shadow:
+          0 14px 40px rgba(0, 0, 0, 0.7),
+          0 2px 6px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(255,42,61,.08),
+          inset 0 1px 0 rgba(255,255,255,.04);
+        overflow: hidden;
+        transition: transform .25s ease, box-shadow .25s ease;
+      }
+      .frame:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 20px 50px rgba(255, 42, 61, 0.18),
+          0 0 0 1px rgba(255,42,61,.22),
+          inset 0 1px 0 rgba(255,255,255,.05);
+      }
+
+      /* left vertical neon RED accent bar */
+      .frame::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 14px; bottom: 14px;
+        width: 4px;
+        border-radius: 0 4px 4px 0;
+        background: var(--accent-grad);
+        box-shadow:
+          0 0 10px rgba(255,42,61,.7),
+          0 0 22px rgba(200,0,36,.45);
+        animation: accentPulse 2.6s ease-in-out infinite;
+      }
+      @keyframes accentPulse {
+        0%, 100% { opacity: .9; box-shadow: 0 0 10px rgba(255,42,61,.7),  0 0 22px rgba(200,0,36,.45); }
+        50%      { opacity: 1;  box-shadow: 0 0 20px rgba(255,42,61,1),   0 0 36px rgba(200,0,36,.7);  }
+      }
+
+      /* shimmering top sheen — RED */
+      .frame::after {
+        content: "";
+        position: absolute;
+        left: 0; right: 0; top: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,42,61,.85), rgba(200,0,36,.7), transparent);
+        opacity: .85;
+      }
+
+      /* corner brackets (4 corners) — ALL RED */
+      .frame > .corner {
+        position: absolute;
+        width: 18px; height: 18px;
+        pointer-events: none;
+        border: 2px solid var(--red-bright);
+        opacity: .9;
+        filter: drop-shadow(0 0 6px rgba(255,42,61,.7));
+      }
+      .frame > .corner.tl { top: 8px;    left: 8px;    border-right: none;  border-bottom: none; border-top-left-radius: 8px; }
+      .frame > .corner.tr { top: 8px;    right: 8px;   border-left: none;   border-bottom: none; border-top-right-radius: 8px; }
+      .frame > .corner.bl { bottom: 8px; left: 8px;    border-right: none;  border-top: none;    border-bottom-left-radius: 8px; }
+      .frame > .corner.br { bottom: 8px; right: 8px;   border-left: none;   border-top: none;    border-bottom-right-radius: 8px; }
+
+      .frame > .corner.tr,
+      .frame > .corner.br { border-color: var(--red-deep); filter: drop-shadow(0 0 6px rgba(200,0,36,.7)); }
+
+      /* ============ PROFILE FRAME — HORIZONTAL LAYOUT ============ */
+      .profile {
+        padding: 18px 18px 18px 26px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .avatar-wrap {
+        position: relative;
+        width: 84px; height: 84px;
+        flex-shrink: 0;
+      }
+      .avatar-ring {
+        position: absolute; inset: 0;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, var(--red-bright), var(--red-neon), var(--red-deep), var(--red-blood), var(--red-bright));
+        padding: 3px;
+        animation: ringSpin 6s linear infinite;
+        filter: drop-shadow(0 0 12px rgba(255,42,61,.6));
+      }
+      @keyframes ringSpin { to { transform: rotate(360deg); } }
+      .avatar-ring::before {
+        content: ""; position: absolute; inset: 3px;
+        border-radius: 50%; background: #07080a;
+      }
+      .avatar {
+        position: absolute; inset: 6px;
+        border-radius: 50%;
+        background-image: url('https://img.upanhnhanh.com/fa94ebd343e67e4fcc6b5f4d0157eb87');
+        background-size: cover; background-position: center;
+        box-shadow: inset 0 0 20px rgba(0,0,0,.6);
+      }
+      .online-dot {
+        position: absolute;
+        right: 2px; bottom: 4px;
+        width: 16px; height: 16px;
+        background: var(--red-bright);
+        border-radius: 50%;
+        border: 2.5px solid #07080a;
+        z-index: 3;
+        box-shadow: 0 0 12px rgba(255,42,61,.95);
+      }
+      .online-dot::before {
+        content: ""; position: absolute; inset: -5px;
+        border-radius: 50%;
+        background: rgba(255,42,61,.45);
+        animation: pulse 1.8s ease-out infinite;
+      }
+      @keyframes pulse {
+        0%   { transform: scale(.6); opacity: .9; }
+        100% { transform: scale(1.6); opacity: 0; }
+      }
+
+      .profile-info {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .name-text {
+        font-family: 'Orbitron', 'Comfortaa', cursive;
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: 1.5px;
+        background: linear-gradient(90deg, #ffffff 0%, var(--red-neon) 50%, var(--red-deep) 100%);
+        -webkit-background-clip: text;
+                background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 22px rgba(255,42,61,.35);
+        line-height: 1.1;
+        animation: nameShine 3.2s linear infinite;
+        background-size: 200% 100%;
+      }
+      @keyframes nameShine {
+        from { background-position: 0% 50%; }
+        to   { background-position: 200% 50%; }
+      }
+
+      .sub-title {
+        font-size: 10.5px;
+        color: var(--text-soft);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .online-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        margin-top: 4px;
+        padding: 4px 10px;
+        background: rgba(255,42,61,.12);
+        border: 1px solid rgba(255,42,61,.45);
+        border-radius: 999px;
+        font-size: 10px;
+        color: var(--red-ember);
+        font-weight: 700;
+        letter-spacing: 1px;
+        align-self: flex-start;
+        box-shadow: 0 0 14px rgba(255,42,61,.22);
+      }
+      .online-badge .blink {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--red-bright);
+        box-shadow: 0 0 6px var(--red-bright);
+        animation: blink 1.2s infinite;
+      }
+      @keyframes blink { 50% { opacity: .3; } }
+
+      /* tiny stats column (right side of profile) */
+      .profile-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-shrink: 0;
+        padding-left: 12px;
+        border-left: 1px dashed rgba(255,42,61,.22);
+      }
+      .stat-pill {
+        display: flex; align-items: center; gap: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-light);
+        background: rgba(255,42,61,.08);
+        border: 1px solid rgba(255,42,61,.28);
+        padding: 3px 8px;
+        border-radius: 8px;
+        letter-spacing: .5px;
+      }
+      .stat-pill i { color: var(--red-bright); font-size: 10px; }
+      .stat-pill.purple { background: rgba(200,0,36,.10);  border-color: rgba(200,0,36,.35); }
+      .stat-pill.purple i { color: var(--red-deep); }
+      .stat-pill.pink   { background: rgba(255,122,133,.10); border-color: rgba(255,122,133,.35); }
+      .stat-pill.pink i { color: var(--red-ember); }
+
+      /* ============ SEARCH FRAME ============ */
+      .search-frame { padding: 20px 20px 20px 26px; border-radius: 22px; }
+
+      .search-header {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 14px;
+      }
+      .search-header i {
+        color: var(--red-bright);
+        font-size: 16px;
+        filter: drop-shadow(0 0 6px rgba(255,42,61,.75));
+      }
+      .search-header h3 {
+        font-family: 'Comfortaa', cursive;
+        font-size: 15px;
+        color: var(--text-light);
+        font-weight: 700;
+        letter-spacing: .5px;
+      }
+      .search-header h3 span {
+        background: linear-gradient(90deg, var(--red-bright), var(--red-deep));
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .search-bar {
+        display: flex; gap: 10px;
+        position: relative;
+      }
+      .search-input-wrap {
+        position: relative; flex: 1;
+      }
+      .search-input-wrap i {
+        position: absolute; top: 50%; left: 16px;
+        transform: translateY(-50%);
+        color: var(--red-bright);
+        font-size: 14px;
+        filter: drop-shadow(0 0 4px rgba(255,42,61,.7));
+      }
+      .search-input {
+        width: 100%;
+        padding: 13px 16px 13px 40px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: rgba(0,0,0,.72);
+        color: var(--text-light);
+        font-family: inherit;
+        font-size: 14px;
+        outline: none;
+        transition: border-color .2s, background .2s, box-shadow .25s;
+      }
+      .search-input::placeholder { color: #6d5560; }
+      .search-input:focus {
+        border-color: var(--red-bright);
+        background: rgba(0,0,0,.92);
+        box-shadow: 0 0 0 3px rgba(255,42,61,.18), 0 0 18px rgba(255,42,61,.28);
+      }
+      .search-btn {
+        background: linear-gradient(135deg, var(--red-bright), var(--red-deep), var(--red-blood));
+        background-size: 200% 200%;
+        border: none;
+        color: #fff;
+        width: 50px;
+        border-radius: 14px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: transform .15s, opacity .2s, box-shadow .25s, background-position .4s;
+        box-shadow: 0 6px 18px rgba(255,42,61,.35), 0 0 0 1px rgba(255,255,255,.05) inset;
+      }
+      .search-btn:hover  {
+        background-position: 100% 100%;
+        box-shadow: 0 8px 24px rgba(200,0,36,.5), 0 0 0 1px rgba(255,255,255,.08) inset;
+      }
+      .search-btn:active { transform: scale(.94); }
+
+      .suggestions {
+        margin-top: 10px;
+        background: rgba(0,0,0,.96);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        max-height: 240px;
+        overflow-y: auto;
+        display: none;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 12px 30px rgba(0,0,0,.7), 0 0 0 1px rgba(255,42,61,.14);
+      }
+      .suggestions.open { display: block; animation: dropdown .25s ease; }
+      @keyframes dropdown {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .suggestion-item {
+        padding: 11px 16px;
+        font-size: 13.5px;
+        color: var(--text-light);
+        cursor: pointer;
+        display: flex; align-items: center; gap: 12px;
+        border-bottom: 1px solid var(--line);
+        transition: background .15s, padding-left .2s;
+        font-weight: 500;
+        position: relative;
+      }
+      .suggestion-item::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 0;
+        background: linear-gradient(180deg, var(--red-bright), var(--red-deep));
+        transition: width .2s;
+        box-shadow: 0 0 8px rgba(255,42,61,.6);
+      }
+      .suggestion-item:last-child { border-bottom: none; }
+      .suggestion-item:hover {
+        background: rgba(255,42,61,.10);
+        padding-left: 22px;
+      }
+      .suggestion-item:hover::before { width: 3px; }
+      .suggestion-item i { color: var(--red-bright); width: 18px; }
+
+      .suggestions::-webkit-scrollbar { width: 6px; }
+      .suggestions::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--red-bright), var(--red-deep));
+        border-radius: 3px;
+      }
+
+      /* ============ SENSITIVITY RESULT ============ */
+      .result-frame {
+        position: relative;
+        margin-top: 16px;
+        padding: 16px 16px 16px 20px;
+        background: var(--bg-card-2);
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        display: none;
+        animation: fadeIn .35s ease;
+        overflow: hidden;
+      }
+      .result-frame::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 10px; bottom: 10px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: linear-gradient(180deg, var(--red-bright), var(--red-deep));
+        box-shadow: 0 0 10px rgba(255,42,61,.65);
+      }
+      .result-frame.open { display: block; }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .result-title {
+        text-align: center;
+        font-family: 'Comfortaa', cursive;
+        font-size: 16px;
+        color: var(--red-bright);
+        font-weight: 700;
+        margin-bottom: 4px;
+        text-shadow: 0 0 14px rgba(255,42,61,.5);
+      }
+      .result-device {
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-soft);
+        margin-bottom: 14px;
+        letter-spacing: .5px;
+        font-weight: 500;
+      }
+
+      .sens-row {
+        display: grid;
+        grid-template-columns: 1fr 36px 22px 1fr 22px;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 6px;
+        border-bottom: 1px solid var(--line);
+        transition: background .2s;
+      }
+      .sens-row:last-child { border-bottom: none; }
+      .sens-row:hover { background: rgba(255,42,61,.05); }
+      .sens-row.highlight {
+        background: linear-gradient(90deg, rgba(255,42,61,.14), rgba(200,0,36,.08));
+        border: 1px solid var(--line-2);
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 0 16px rgba(255,42,61,.14) inset;
+      }
+      .sens-name {
+        font-size: 13px;
+        color: var(--text-light);
+        font-weight: 600;
+      }
+      .sens-value {
+        font-family: 'JetBrains Mono', 'Comfortaa', cursive;
+        font-size: 14px;
+        color: var(--red-bright);
+        text-align: right;
+        font-weight: 700;
+        text-shadow: 0 0 8px rgba(255,42,61,.55);
+      }
+      .sens-btn {
+        width: 24px; height: 24px;
+        background: rgba(255,255,255,.04);
+        color: var(--red-bright);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: background .15s, box-shadow .2s, transform .1s;
+      }
+      .sens-btn:hover {
+        background: rgba(255,42,61,.20);
+        box-shadow: 0 0 10px rgba(255,42,61,.5);
+      }
+      .sens-btn:active { transform: scale(.9); }
+
+      .sens-track {
+        position: relative;
+        height: 6px;
+        background: rgba(255,255,255,.06);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .sens-fill {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        background: linear-gradient(90deg, var(--red-bright), var(--red-deep), var(--red-blood));
+        border-radius: 999px;
+        animation: fillSlide .8s ease;
+        box-shadow: 0 0 10px rgba(255,42,61,.6);
+      }
+      @keyframes fillSlide { from { width: 0 !important; } }
+      .sens-thumb {
+        position: absolute; top: 50%;
+        transform: translate(-50%, -50%);
+        width: 14px; height: 14px;
+        background: #07080a;
+        border: 2px solid var(--red-bright);
+        border-radius: 50%;
+        box-shadow: 0 0 8px rgba(255,42,61,.75);
+      }
+
+      /* ============ BULLET FRAME ============ */
+      .bullet-frame {
+        position: relative;
+        margin-top: 16px;
+        padding: 16px 16px 16px 20px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(40,6,10,.7), rgba(20,4,8,.7));
+        border: 1px solid rgba(255,42,61,.35);
+        display: none;
+        align-items: center; gap: 16px;
+        animation: fadeIn .4s ease;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(255,42,61,.18);
+      }
+      .bullet-frame::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 10px; bottom: 10px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: linear-gradient(180deg, var(--red-bright), var(--red-deep));
+        box-shadow: 0 0 12px rgba(255,42,61,.85);
+      }
+      .bullet-frame.open { display: flex; }
+
+      .bullet-icon {
+        flex-shrink: 0;
+        width: 86px; height: 86px;
+        filter: drop-shadow(0 0 14px rgba(255,42,61,.5));
+      }
+      .bullet-text { flex: 1; }
+      .bullet-label {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        color: var(--red-ember);
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      .bullet-percent {
+        font-family: 'Orbitron', 'Comfortaa', cursive;
+        font-size: 36px;
+        font-weight: 900;
+        color: var(--red-bright);
+        line-height: 1.1;
+        text-shadow: 0 0 18px rgba(255,42,61,.7);
+      }
+      .bullet-sub {
+        font-size: 11.5px;
+        color: var(--red-ember);
+        opacity: .85;
+        margin-top: 2px;
+        font-weight: 500;
+      }
+
+      /* ============ CODER MODAL (custom — replaces SweetAlert default look) ============ */
+      .swal2-container { z-index: 99999 !important; }
+      .swal2-popup.coder-modal {
+        background: rgba(8,4,6,.94) !important;
+        color: var(--text-light) !important;
+        border: 1px solid rgba(255,42,61,.4) !important;
+        border-radius: 14px !important;
+        font-family: 'JetBrains Mono', 'Quicksand', monospace !important;
+        box-shadow:
+          0 30px 80px rgba(0,0,0,.8),
+          0 0 0 1px rgba(255,42,61,.14),
+          0 0 60px rgba(255,42,61,.28) !important;
+        backdrop-filter: blur(18px);
+        padding: 0 !important;
+        overflow: hidden !important;
+        position: relative;
+      }
+      .swal2-popup.coder-modal::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 3px;
+        background: var(--accent-grad);
+        box-shadow: 0 0 14px rgba(255,42,61,.8);
+      }
+      .swal2-popup.coder-modal::after {
+        content: "";
+        position: absolute;
+        left: 0; right: 0; top: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,42,61,.85), rgba(200,0,36,.7), transparent);
+      }
+      /* terminal title bar */
+      .coder-modal .coder-bar {
+        display: flex; align-items: center; gap: 8px;
+        padding: 10px 14px;
+        background: rgba(0,0,0,.55);
+        border-bottom: 1px solid rgba(255,42,61,.18);
+        font-size: 11px;
+        color: var(--text-soft);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      .coder-modal .coder-bar .dots { display: flex; gap: 6px; margin-right: 8px; }
+      .coder-modal .coder-bar .dots span {
+        width: 10px; height: 10px; border-radius: 50%;
+        box-shadow: 0 0 6px currentColor;
+      }
+      .coder-modal .coder-bar .dots .d1 { background: var(--red-bright); color: var(--red-bright); }
+      .coder-modal .coder-bar .dots .d2 { background: var(--red-neon);   color: var(--red-neon); }
+      .coder-modal .coder-bar .dots .d3 { background: var(--red-deep);   color: var(--red-deep); }
+      .coder-modal .coder-bar .path { color: var(--red-bright); }
+      .coder-modal .swal2-icon { margin: 18px auto 6px !important; transform: scale(.85); }
+      .coder-modal .swal2-title {
+        color: var(--red-bright) !important;
+        font-family: 'Orbitron', 'Comfortaa', cursive !important;
+        font-weight: 900 !important;
+        letter-spacing: 1px !important;
+        text-shadow: 0 0 16px rgba(255,42,61,.55);
+        padding: 8px 24px 4px !important;
+        font-size: 18px !important;
+      }
+      .coder-modal .swal2-html-container {
+        color: var(--text-light) !important;
+        padding: 4px 24px 18px !important;
+        font-family: 'Quicksand', sans-serif !important;
+        font-size: 13.5px !important;
+        line-height: 1.55 !important;
+      }
+      .coder-modal .swal2-html-container .prompt {
+        display: block;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--red-ember);
+        font-size: 12px;
+        margin-bottom: 6px;
+        opacity: .9;
+      }
+      .coder-modal .swal2-html-container .prompt::before { content: "$ "; color: var(--red-bright); }
+      .coder-modal .swal2-html-container b {
+        color: var(--red-bright);
+        text-shadow: 0 0 6px rgba(255,42,61,.5);
+      }
+      .coder-modal .swal2-actions { padding: 4px 18px 18px !important; }
+      .coder-modal .swal2-confirm {
+        background: linear-gradient(135deg, var(--red-bright), var(--red-deep), var(--red-blood)) !important;
+        background-size: 200% 200% !important;
+        border: 1px solid rgba(255,255,255,.08) !important;
+        border-radius: 10px !important;
+        font-family: 'Quicksand', sans-serif !important;
+        font-weight: 700 !important;
+        letter-spacing: .5px !important;
+        padding: 9px 22px !important;
+        box-shadow: 0 8px 22px rgba(255,42,61,.4) !important;
+        transition: background-position .35s, box-shadow .25s !important;
+      }
+      .coder-modal .swal2-confirm:hover {
+        background-position: 100% 100% !important;
+        box-shadow: 0 10px 28px rgba(200,0,36,.5) !important;
+      }
+      .coder-modal .swal2-cancel {
+        border-radius: 10px !important;
+        font-family: 'Quicksand', sans-serif !important;
+        font-weight: 700 !important;
+        background: rgba(255,255,255,.05) !important;
+        border: 1px solid var(--line) !important;
+      }
+      .coder-modal .swal2-timer-progress-bar {
+        background: linear-gradient(90deg, var(--red-bright), var(--red-deep)) !important;
+        height: 3px !important;
+      }
+      .coder-modal .swal2-loader {
+        border-color: var(--red-bright) transparent var(--red-deep) transparent !important;
+      }
+      .coder-modal .swal2-icon.swal2-warning { color: var(--red-bright) !important; border-color: var(--red-bright) !important; }
+      .coder-modal .swal2-icon.swal2-success { color: var(--red-bright) !important; border-color: var(--red-bright) !important; }
+      .coder-modal .swal2-icon.swal2-success [class^=swal2-success-line] { background-color: var(--red-bright) !important; }
+      .coder-modal .swal2-icon.swal2-success .swal2-success-ring { border-color: rgba(255,42,61,.5) !important; }
+
+      /* backdrop */
+      .swal2-backdrop-show {
+        background: radial-gradient(circle at center, rgba(255,42,61,.10) 0%, rgba(0,0,0,.86) 70%) !important;
+        backdrop-filter: blur(4px);
+      }
+
+      /* ============ RESPONSIVE ============ */
+      @media (max-width: 380px) {
+        .name-text { font-size: 19px; }
+        .avatar-wrap { width: 72px; height: 72px; }
+        .profile-stats { padding-left: 8px; }
+        .stat-pill { font-size: 9px; padding: 2px 6px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+
+      <!-- ====== PROFILE FRAME (HORIZONTAL) ====== -->
+      <div class="frame profile">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+
+        <div class="avatar-wrap">
+          <div class="avatar-ring"></div>
+          <div class="avatar"></div>
+          <div class="online-dot"></div>
+        </div>
+
+        <div class="profile-info">
+          <div class="name-text">Huấn Hà</div>
+          <div class="sub-title">App Độ Nhạy Siêu Vip</div>
+          <div class="online-badge">
+            <span class="blink"></span> ONLINE
+          </div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="stat-pill"><i class="fa-solid fa-bolt"></i> PRO</div>
+          <div class="stat-pill purple"><i class="fa-solid fa-crosshairs"></i> AIM</div>
+          <div class="stat-pill pink"><i class="fa-solid fa-fire"></i> Super</div>
+        </div>
+      </div>
+
+      <!-- ====== SEARCH FRAME ====== -->
+      <div class="frame search-frame">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+
+        <div class="search-header">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+          <h3>Tìm <span>thiết bị</span> của bạn</h3>
+        </div>
+
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="VD: iPhone 13, Samsung S23..." autocomplete="off"/>
+          </div>
+          <button class="search-btn" id="searchBtn" title="Enter">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <div class="suggestions" id="suggestions"></div>
+
+        <!-- Sensitivity result -->
+        <div class="result-frame" id="resultFrame">
+          <div class="result-title"><i class="fa-solid fa-bullseye"></i>  Độ nhạy đề xuất</div>
+          <div class="result-device" id="resultDevice">—</div>
+          <div id="sensList"></div>
+        </div>
+
+        <!-- Bullet button -->
+        <div class="bullet-frame" id="bulletFrame">
+          <div class="bullet-icon" id="bulletIcon"></div>
+          <div class="bullet-text">
+            <div class="bullet-label"><i class="fa-solid fa-crosshairs"></i> Nút bắn</div>
+            <div class="bullet-percent" id="bulletPercent">0%</div>
+            <div class="bullet-sub">Tỉ lệ headshot khuyến nghị</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SVG bullet template -->
+    <template id="bulletSvg">
+      <svg viewBox="0 0 100 100" width="86" height="86" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"  stop-color="#3a3a3a"/>
+            <stop offset="100%" stop-color="#0a0a0a"/>
+          </radialGradient>
+          <linearGradient id="bulletGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"  stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#bdbdbd"/>
+          </linearGradient>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"  stop-color="#ff9aa2"/>
+            <stop offset="50%" stop-color="#ff2a3d"/>
+            <stop offset="100%" stop-color="#8b0011"/>
+          </linearGradient>
+        </defs>
+
+        <circle cx="50" cy="50" r="48" fill="none" stroke="#bbb" stroke-width=".7" stroke-dasharray="1 3"/>
+        <circle cx="50" cy="50" r="40" fill="none" stroke="url(#ringGrad)" stroke-width="4"/>
+        <g stroke="#999" stroke-width="1.4">
+          <line x1="50" y1="6"  x2="50" y2="14"/>
+          <line x1="50" y1="86" x2="50" y2="94"/>
+          <line x1="6"  y1="50" x2="14" y2="50"/>
+          <line x1="86" y1="50" x2="94" y2="50"/>
+        </g>
+        <circle cx="50" cy="50" r="32" fill="url(#bgGrad)" stroke="#222" stroke-width="1"/>
+
+        <g transform="translate(38 28) rotate(20)">
+          <path d="M9 0 C 13 0 16 3 16 7 V 30 H 2 V 7 C 2 3 5 0 9 0 Z"
+                fill="url(#bulletGrad)" stroke="#777" stroke-width=".5"/>
+          <rect x="2" y="30" width="14" height="3" fill="#aaa"/>
+          <rect x="2" y="33" width="14" height="14" fill="#cfcfcf" stroke="#777" stroke-width=".5"/>
+          <line x1="2" y1="38" x2="16" y2="38" stroke="#888" stroke-width=".4"/>
+          <line x1="2" y1="42" x2="16" y2="42" stroke="#888" stroke-width=".4"/>
+        </g>
+        <path d="M30 60 L42 56 L36 64 L48 62 L34 76 L40 68 L28 72 Z"
+              fill="#ffffff" opacity=".95"/>
+        <path d="M30 60 L42 56 L36 64 L48 62 L34 76 L40 68 L28 72 Z"
+              fill="none" stroke="#cfcfcf" stroke-width=".5"/>
+      </svg>
+    </template>
+
+    <script>
+      /* ============ CODER MODAL HELPER ============ */
+      function coderModal(opts) {
+        const path = opts.path || "huanha@sensitivity:~$";
+        const title = opts.title || "";
+        const html = opts.html || (opts.text ? `<div>${opts.text}</div>` : "");
+        const promptLine = opts.prompt ? `<span class="prompt">${opts.prompt}</span>` : "";
+        const composedHtml = `${promptLine}${html}`;
+        const composedTitle = `
+          <div class="coder-bar">
+            <div class="dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+            <span class="path">${path}</span>
+          </div>
+          <div style="padding-top:6px">${title}</div>
+        `;
+
+        return Swal.fire({
+          icon: opts.icon,
+          title: composedTitle,
+          html: composedHtml,
+          confirmButtonText: opts.confirmButtonText || "OK",
+          showConfirmButton: opts.showConfirmButton !== false,
+          showCancelButton: !!opts.showCancelButton,
+          timer: opts.timer,
+          timerProgressBar: !!opts.timerProgressBar,
+          didOpen: opts.didOpen,
+          customClass: { popup: 'coder-modal' },
+          buttonsStyling: false,
+          background: 'transparent',
+        });
+      }
+
+      /* ============ DEVICE LIST ============ */
+      const DEVICES = [
+        // iPhone
+        "iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XS","iPhone XS Max","iPhone XR",
+        "iPhone 11","iPhone 11 Pro","iPhone 11 Pro Max","iPhone SE 2020",
+        "iPhone 12 Mini","iPhone 12","iPhone 12 Pro","iPhone 12 Pro Max",
+        "iPhone 13 Mini","iPhone 13","iPhone 13 Pro","iPhone 13 Pro Max",
+        "iPhone 14","iPhone 14 Plus","iPhone 14 Pro","iPhone 14 Pro Max",
+        "iPhone 15","iPhone 15 Plus","iPhone 15 Pro","iPhone 15 Pro Max",
+        "iPhone 16","iPhone 16 Plus","iPhone 16 Pro","iPhone 16 Pro Max",
+        // Samsung
+        "Samsung Galaxy S20","Samsung Galaxy S20 Ultra","Samsung Galaxy S21","Samsung Galaxy S21 Ultra",
+        "Samsung Galaxy S22","Samsung Galaxy S22 Ultra","Samsung Galaxy S23","Samsung Galaxy S23 Ultra",
+        "Samsung Galaxy S24","Samsung Galaxy S24 Ultra","Samsung Galaxy Note 20","Samsung Galaxy Note 20 Ultra",
+        "Samsung Galaxy A52","Samsung Galaxy A53","Samsung Galaxy A54","Samsung Galaxy A73",
+        "Samsung Galaxy Z Fold 5","Samsung Galaxy Z Flip 5",
+        // Realme
+        "Realme 8","Realme 8 Pro","Realme 9","Realme 9 Pro","Realme 10","Realme 10 Pro","Realme 11","Realme 11 Pro",
+        "Realme GT","Realme GT Neo 2","Realme GT Neo 3","Realme GT2 Pro","Realme C55","Realme Narzo 50",
+        // Xiaomi
+        "Xiaomi 11","Xiaomi 12","Xiaomi 13","Xiaomi 13 Pro","Xiaomi 14","Xiaomi 14 Pro","Xiaomi 14 Ultra",
+        "Xiaomi Redmi Note 11","Xiaomi Redmi Note 12","Xiaomi Redmi Note 13","Xiaomi Redmi Note 13 Pro",
+        "Xiaomi POCO X5","Xiaomi POCO X6","Xiaomi POCO F5","Xiaomi POCO F6",
+        // Oppo / Vivo / OnePlus / Asus
+        "Oppo Reno 8","Oppo Reno 9","Oppo Reno 10","Oppo Reno 11","Oppo Find X5","Oppo Find X6","Oppo A78",
+        "Vivo V25","Vivo V27","Vivo V29","Vivo X80","Vivo X90","Vivo Y36",
+        "OnePlus 9","OnePlus 10","OnePlus 11","OnePlus 12","OnePlus Nord 3",
+        "Asus ROG Phone 6","Asus ROG Phone 7","Asus ROG Phone 8",
+        // Huawei / Honor / Nokia / Google
+        "Huawei P40","Huawei P50","Huawei Mate 50","Huawei Nova 11",
+        "Honor 90","Honor Magic 5","Honor Magic 6",
+        "Google Pixel 6","Google Pixel 7","Google Pixel 8","Google Pixel 8 Pro",
+        "Nokia X30","Nokia G50",
+      ];
+
+      /* ============ SOUND ============ */
+      let audioCtx = null;
+      function playClick() {
+        try {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = "square";
+          o.frequency.setValueAtTime(880, audioCtx.currentTime);
+          o.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.05);
+          g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start();
+          o.stop(audioCtx.currentTime + 0.09);
+        } catch(e) {}
+      }
+
+      /* ============ SEARCH SUGGESTIONS ============ */
+      const input = document.getElementById("searchInput");
+      const sugBox = document.getElementById("suggestions");
+      const searchBtn = document.getElementById("searchBtn");
+
+      function renderSuggestions(query) {
+        const q = query.trim().toLowerCase();
+        if (!q) { sugBox.classList.remove("open"); sugBox.innerHTML = ""; return; }
+        const matches = DEVICES.filter(d => d.toLowerCase().includes(q)).slice(0, 8);
+        if (matches.length === 0) { sugBox.classList.remove("open"); sugBox.innerHTML = ""; return; }
+        sugBox.innerHTML = matches.map(m => {
+          const lower = m.toLowerCase();
+          let icon = "fa-mobile-screen";
+          if (lower.includes("iphone")) icon = "fa-brands fa-apple";
+          else if (lower.includes("samsung")) icon = "fa-mobile";
+          else if (lower.includes("xiaomi") || lower.includes("poco") || lower.includes("redmi")) icon = "fa-mobile-screen-button";
+          else if (lower.includes("oppo") || lower.includes("realme")) icon = "fa-mobile-button";
+          else if (lower.includes("google") || lower.includes("pixel")) icon = "fa-brands fa-google";
+          else if (lower.includes("huawei") || lower.includes("honor")) icon = "fa-mobile-screen";
+          return `<div class="suggestion-item" data-val="${m}">
+            <i class="${icon.startsWith('fa-brands') ? icon : 'fa-solid ' + icon}"></i>
+            <span>${m}</span>
+          </div>`;
+        }).join("");
+        sugBox.classList.add("open");
+      }
+
+      input.addEventListener("input", e => renderSuggestions(e.target.value));
+      input.addEventListener("focus", e => renderSuggestions(e.target.value));
+
+      sugBox.addEventListener("click", e => {
+        const item = e.target.closest(".suggestion-item");
+        if (!item) return;
+        playClick();
+        input.value = item.dataset.val;
+        sugBox.classList.remove("open");
+        runSearch();
+      });
+
+      document.addEventListener("click", e => {
+        if (!e.target.closest(".search-bar") && !e.target.closest(".suggestions")) {
+          sugBox.classList.remove("open");
+        }
+      });
+
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") { e.preventDefault(); playClick(); runSearch(); }
+      });
+      searchBtn.addEventListener("click", () => { playClick(); runSearch(); });
+
+      /* ============ RANDOM SENSITIVITY ============ */
+      function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+      function runSearch() {
+        const q = input.value.trim();
+        if (!q) {
+          coderModal({
+            icon: "warning",
+            title: "Vui lòng nhập tên thiết bị",
+            prompt: "scan --device",
+            html: `<div>Hãy gõ tên thiết bị bạn đang dùng để nhận độ nhạy chuẩn.</div>`,
+            confirmButtonText: "Đã hiểu",
+          });
+          return;
+        }
+        sugBox.classList.remove("open");
+
+        coderModal({
+          title: "Đang tính toán độ nhạy...",
+          prompt: `analyze --target "${q}"`,
+          html: `<div>Phân tích tối ưu cho <b>${q}</b></div>`,
+          timer: 900,
+          timerProgressBar: true,
+          didOpen: () => Swal.showLoading(),
+          showConfirmButton: false,
+        }).then(() => {
+          renderSensitivity(q);
+        });
+      }
+
+      function renderSensitivity(deviceName) {
+        const SENS = [
+          { name: "Nhìn xung quanh",      min: 175, max: 200, hl: true },
+          { name: "Ống ngắm hồng tâm",     min: 130, max: 175 },
+          { name: "Ống ngắm 2x",           min: 95,  max: 145 },
+          { name: "Ống ngắm 4x",           min: 70,  max: 110 },
+          { name: "Ống ngắm súng ngắm",    min: 35,  max: 70  },
+          { name: "Nút camera tự do",      min: 55,  max: 100 },
+        ];
+
+        const list = document.getElementById("sensList");
+        list.innerHTML = SENS.map(s => {
+          const v = rand(s.min, s.max);
+          const pct = Math.min(100, Math.round((v / 200) * 100));
+          return `
+            <div class="sens-row ${s.hl ? "highlight" : ""}">
+              <div class="sens-name">${s.name}</div>
+              <div class="sens-value">${v}</div>
+              <button class="sens-btn">−</button>
+              <div class="sens-track">
+                <div class="sens-fill" style="width:${pct}%"></div>
+                <div class="sens-thumb" style="left:${pct}%"></div>
+              </div>
+              <button class="sens-btn">+</button>
+            </div>
+          `;
+        }).join("");
+
+        document.getElementById("resultDevice").textContent = "Thiết bị: " + deviceName;
+        document.getElementById("resultFrame").classList.add("open");
+
+        const bulletPct = rand(32, 45);
+        const bf = document.getElementById("bulletFrame");
+        const bi = document.getElementById("bulletIcon");
+        const bp = document.getElementById("bulletPercent");
+        bi.innerHTML = "";
+        bi.appendChild(document.getElementById("bulletSvg").content.cloneNode(true));
+        bp.textContent = bulletPct + "%";
+        bf.classList.add("open");
+
+        bf.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      /* ============ Sensitivity +/- buttons sound ============ */
+      document.addEventListener("click", e => {
+        if (e.target.closest(".sens-btn")) playClick();
+      });
+
+      /* ============ Welcome modal ============ */
+      window.addEventListener("load", () => {
+        coderModal({
+          icon: "success",
+          title: "Chào mừng!",
+          prompt: "boot --user huanha",
+          html: `<div>Đây là app độ nhạy của <b>Huấn Hà</b>.<br/>Hãy nhập tên thiết bị để nhận setting chuẩn.</div>`,
+          confirmButtonText: "Bắt đầu",
+          timer: 4000,
+          timerProgressBar: true,
+        });
+      });
+
+      /* ============ Click sound on every button-like element ============ */
+      document.querySelectorAll(".search-btn, .suggestion-item").forEach(el => {
+        el.addEventListener("mousedown", playClick);
+      });
+    </script>
+  </body>
+</html>
